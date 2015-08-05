@@ -1,5 +1,6 @@
 [Unit]
 Description=Ping-Pong
+BindsTo=ping-pong-sidekick@%i.service
 After=docker.service
 
 [Service]
