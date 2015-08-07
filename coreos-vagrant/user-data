@@ -9,7 +9,7 @@ coreos:
   #   peer-addr: $public_ipv4:7001
   etcd2:
     #generate a new token for each unique cluster from https://discovery.etcd.io/new
-    discovery: https://discovery.etcd.io/aa2d42f7a57b7aecf44bbc88f5875a4e
+    discovery: https://discovery.etcd.io/3e680fe6180c7e76852d5da91d0c7be4
     # multi-region and multi-cloud deployments need to use $public_ipv4
     advertise-client-urls: http://$public_ipv4:2379
     initial-advertise-peer-urls: http://$private_ipv4:2380

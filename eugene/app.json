@@ -1,0 +1,7 @@
+{
+    "name": "saphir",
+    "image": "nesurion/saphir",
+    "port": 4567,
+    "env": [],
+    "args": []
+}
