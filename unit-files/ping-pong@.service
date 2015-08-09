@@ -5,8 +5,8 @@ After=docker.service
 
 [Service]
 TimeoutStartSec=0
-ExecStartPre=-/usr/bin/docker kill ping-pong
-ExecStartPre=-/usr/bin/docker rm ping-pong
+ExecStartPre=-/usr/bin/docker kill ping-pong-%i
+ExecStartPre=-/usr/bin/docker rm ping-pong-%i
 ExecStartPre=/usr/bin/docker pull nesurion/ping-pong
-ExecStart=/usr/bin/docker run --rm --name ping-pong -p 8880:8880 nesurion/ping-pong
-ExecStop=/usr/bin/docker kill ping-pong
+ExecStart=/usr/bin/docker run --rm --name ping-pong-%i -p 8880 nesurion/ping-pong
+ExecStop=/usr/bin/docker kill ping-pong-%i
