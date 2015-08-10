@@ -1,0 +1,21 @@
+[Unit]
+Description="Sidekick for Ping-Pong"
+BindsTo=ping-pong@%i.service
+After=ping-pong@%i.service
+
+[Service]
+EnvironmentFile=/etc/environment
+RemainAfterExit=yes
+
+ExecStart=/bin/sh -c \
+  "sleep 1; \
+  port=$(/usr/bin/docker inspect ping-pong-%i | jq -r '.[].NetworkSettings.Ports.\"8880/tcp\"[].\"HostPort\"'); \
+  echo $port; \
+  /bin/etcdctl set \"/vulcand/upstreams/ping-pong/endpoints/%p-%i\" http://$COREOS_PUBLIC_IPV4:$port; \
+  /bin/etcdctl set \"/vulcand/hosts/ping.greenswarm.io/locations/home/path\" '/.*'; \
+  /bin/etcdctl set /vulcand/hosts/ping.greenswarm.io/locations/home/upstream ping-pong"
+
+ExecStop=/bin/sh -c "/bin/etcdctl rm /vulcand/upstreams/ping-pong/endpoints/%p-%i"
+
+[X-Fleet]
+X-ConditionMachineOf=ping-pong@%i.service

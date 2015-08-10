@@ -1,12 +1,12 @@
 [Unit]
 Description=Ping-Pong
-BindsTo=ping-pong-sidekick@%i.service
+BindsTo=ping-pong-sk@%i.service
 After=docker.service
 
 [Service]
 TimeoutStartSec=0
-ExecStartPre=-/usr/bin/docker kill ping-pong-%i
-ExecStartPre=-/usr/bin/docker rm ping-pong-%i
+ExecStartPre=-/usr/bin/docker kill %p-%i
+ExecStartPre=-/usr/bin/docker rm %p-%i
 ExecStartPre=/usr/bin/docker pull nesurion/ping-pong
-ExecStart=/usr/bin/docker run --rm --name ping-pong-%i -p 8880 nesurion/ping-pong
-ExecStop=/usr/bin/docker kill ping-pong-%i
+ExecStart=/usr/bin/docker run --name %p-%i -p 8880 nesurion/ping-pong
+ExecStop=/usr/bin/docker kill %p-%i
