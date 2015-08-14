@@ -1,0 +1,12 @@
+[Unit]
+Description=Saphir
+BindsTo=saphir-sk@%i.service
+After=docker.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill %p-%i
+ExecStartPre=-/usr/bin/docker rm %p-%i
+ExecStartPre=/usr/bin/docker pull nesurion/saphir
+ExecStart=/usr/bin/docker run --name %p-%i -p 4567 nesurion/saphir
+ExecStop=/usr/bin/docker kill %p-%i

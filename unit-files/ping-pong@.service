@@ -1,0 +1,12 @@
+[Unit]
+Description=Ping-Pong
+BindsTo=ping-pong-sk@%i.service
+After=docker.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill %p-%i
+ExecStartPre=-/usr/bin/docker rm %p-%i
+ExecStartPre=/usr/bin/docker pull nesurion/ping-pong
+ExecStart=/usr/bin/docker run --name %p-%i -p 8880 nesurion/ping-pong
+ExecStop=/usr/bin/docker kill %p-%i
