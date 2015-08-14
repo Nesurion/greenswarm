@@ -7,6 +7,7 @@ import (
 	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
+	"os/exec"
 	"text/template"
 )
 
@@ -21,8 +22,18 @@ func main() {
 		},
 	}
 
+	var cmdStatus = &cobra.Command{
+		Use:   "status [app-name]",
+		Short: "show status of an app",
+		Long:  `todo: add description`,
+		Run: func(cmd *cobra.Command, args []string) {
+			listUnits(args[0])
+		},
+	}
+
 	var rootCmd = &cobra.Command{Use: "eugene"}
 	rootCmd.AddCommand(cmdCreate)
+	rootCmd.AddCommand(cmdStatus)
 	rootCmd.Execute()
 }
 
@@ -62,4 +73,13 @@ func generateUnitFiles(app App) {
 		fmt.Printf("Error: %v\n", err)
 		os.Exit(1)
 	}
+}
+
+func listUnits(appname string) {
+	// fmt.Sprintf("%s", appname)
+	out, err := exec.Command("/usr/local/bin/fleetctl", "list-units").Output()
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+	}
+	fmt.Printf("%s", out)
 }
