@@ -1,0 +1,21 @@
+[Unit]
+Description="Sidekick for {{.Name}}"
+BindsTo={{.Name}}@%i.service
+After={{.Name}}@%i.service
+
+[Service]
+EnvironmentFile=/etc/environment
+RemainAfterExit=yes
+
+ExecStart=/bin/sh -c \
+  "sleep 1; \
+  port=$(/usr/bin/docker inspect {{.Name}}-%i | jq -r '.[].NetworkSettings.Ports.\"4567/tcp\"[].\"HostPort\"'); \
+  echo \"{{.Name}}-%i running on port: {$port}\"; \
+  /bin/etcdctl set \"/vulcand/upstreams/{{.Name}}/endpoints/%p-%i\" http://$COREOS_PUBLIC_IPV4:$port; \
+  /bin/etcdctl set \"/vulcand/hosts/{{.Name}}.greenswarm.io/locations/home/path\" '/.*'; \
+  /bin/etcdctl set /vulcand/hosts/{{.Name}}.greenswarm.io/locations/home/upstream {{.Name}}"
+
+ExecStop=/bin/sh -c "/bin/etcdctl rm /vulcand/upstreams/{{.Name}}/endpoints/%p-%i"
+
+[X-Fleet]
+X-ConditionMachineOf={{.Name}}@%i.service

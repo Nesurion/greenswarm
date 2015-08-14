@@ -1,0 +1,12 @@
+[Unit]
+Description={{.Name}}
+BindsTo={{.Name}}-sk@%i.service
+After=docker.service
+
+[Service]
+TimeoutStartSec=0
+ExecStartPre=-/usr/bin/docker kill %p-%i
+ExecStartPre=-/usr/bin/docker rm %p-%i
+ExecStartPre=/usr/bin/docker pull {{.Image}}
+ExecStart=/usr/bin/docker run --name %p-%i -p {{.Port}} {{.Image}}
+ExecStop=/usr/bin/docker kill %p-%i
