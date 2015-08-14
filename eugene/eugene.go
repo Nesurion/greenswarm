@@ -3,46 +3,63 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	// "github.com/giantswarm/generic-types-go"
+	"github.com/spf13/cobra"
 	"io/ioutil"
 	"os"
+	"text/template"
 )
 
-type App struct {
-	Name  string   `json:"name"`
-	Image string   `json:"image"`
-	Port  int      `json:"port"`
-	Env   []string `json:"env"`
-	Args  []string `json:"args"`
+func main() {
+
+	var cmdCreate = &cobra.Command{
+		Use:   "create",
+		Short: "create new unitfiles for an app.json",
+		Long:  `todo: add description`,
+		Run: func(cmd *cobra.Command, args []string) {
+			generateUnitFiles(parseJSON())
+		},
+	}
+
+	var rootCmd = &cobra.Command{Use: "eugene"}
+	rootCmd.AddCommand(cmdCreate)
+	rootCmd.Execute()
 }
 
-func main() {
+func parseJSON() App {
+	var app App
 	appJSON, err := ioutil.ReadFile("./app.json")
 	if err != nil {
 		fmt.Printf("File error: %v\n", err)
 		os.Exit(1)
 	}
-	var appGo App
-	appGo, err = validateAppDefinitionFile(appJSON, appGo)
+	app, err = validateAppDefinitionFile(appJSON, app)
 	if err != nil {
 		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
 	}
-	fmt.Printf("%+v", appGo)
-	// parseAppDefinitionToUnitFile()
-	// writeUnitFile()
+	return app
 }
 
-func validateAppDefinitionFile(appJSON []byte, appGo App) (App, error) {
-	err := json.Unmarshal(appJSON, &appGo)
+func validateAppDefinitionFile(data []byte, app App) (App, error) {
+	err := json.Unmarshal(data, &app)
 	if err != nil {
-		return nil, err
+		return app, err
 	}
-	return appGo, nil
+	return app, nil
 }
 
-// func parseAppDefinitionToUnitFile() {
-
-// }
-
-// func writeUnitFile() {
-
-// }
+func generateUnitFiles(app App) {
+	tmpl_app := template.Must(template.ParseFiles("./tmpl/app.tmpl"))
+	tmpl_sk := template.Must(template.ParseFiles("./tmpl/sk.tmpl"))
+	err := tmpl_app.Execute(os.Stdout, app)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
+	err = tmpl_sk.Execute(os.Stdout, app)
+	if err != nil {
+		fmt.Printf("Error: %v\n", err)
+		os.Exit(1)
+	}
+}
